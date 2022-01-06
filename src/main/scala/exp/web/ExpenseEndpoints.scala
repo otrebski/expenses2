@@ -22,16 +22,15 @@ object ExpenseEndpoints {
   case class RequestAuthenticationError(wrapped: AuthenticationError) extends RequestError
   case class Other(msg: String) extends RequestError
 
-  private def authLogic[F[_]: Sync](token: AuthenticationToken): F[Either[AuthenticationError, User]] =
-    if (token.value == "berries") User("Papa Smurf").asRight[AuthenticationError].pure[F]
-    else if (token.value == "smurf") User("Gargamel").asRight[AuthenticationError].pure[F]
-    else AuthenticationError(1001).asLeft[User].pure[F]
+  private def authLogic[F[_]: Sync](usernamePassword: UsernamePassword): F[Either[AuthenticationError, User]] = usernamePassword match {
+    case UsernamePassword("a",Some("a")) => User("a").asRight[AuthenticationError].pure[F]
+    case _ => AuthenticationError(1001).asLeft[User].pure[F]
+  }
+
 
   private val secureEndpoint = endpoint
-    .securityIn(auth.bearer[String]().mapTo[AuthenticationToken])
-//    .errorOut(plainBody[Int].mapTo[RequestError])
+    .securityIn(auth.basic[UsernamePassword]())
     .errorOut(plainBody[Int].map[AuthenticationError](i => AuthenticationError(i))(_.code))
-//    .errorOut(plainBody([Int].m))
     .serverSecurityLogic(t => authLogic[IO](t))
     .mapErrorOut(RequestAuthenticationError)(_.wrapped)
     .errorOutVariant[RequestError](oneOfVariant(stringBody.mapTo[Other]))

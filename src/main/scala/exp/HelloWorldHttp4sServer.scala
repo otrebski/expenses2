@@ -1,25 +1,16 @@
 package exp
 
-import cats.conversions.all.autoConvertProfunctorVariance
-import cats.data.Kleisli
 import cats.effect._
 import cats.syntax.all._
-import exp.model.Model
-import exp.model.Model.Date
 import exp.model.Model.Expense
-import exp.model.Model.Note
-import exp.model.Model.Purpose
 import exp.service.ExpenseService
 import exp.web.ExpenseEndpoints
 import exp.web.ExpenseEndpoints.Other
 import exp.web.ExpenseEndpoints.RequestError
-import exp.web.ExpenseEndpoints.editExpense
 import org.http4s.server.Router
 import org.http4s.blaze.server.BlazeServerBuilder
 import sttp.tapir._
-import sttp.tapir.model.UsernamePassword
 import sttp.tapir.server.ServerEndpoint
-import sttp.tapir.server.ServerEndpoint.Full
 import sttp.tapir.server.http4s.Http4sServerInterpreter
 
 import scala.concurrent.ExecutionContext
@@ -56,7 +47,6 @@ object HelloWorldHttp4sServer extends IOApp {
     deleteExpense
   )
 
-// converting an endpoint to a route (providing server-side logic); extension method comes from imported packages
   val apiRoutes: HttpRoutes[IO] = Http4sServerInterpreter[IO]().toRoutes(endpoints)
 
   import org.http4s.dsl.io._
@@ -65,7 +55,6 @@ object HelloWorldHttp4sServer extends IOApp {
     case GET -> Root => MovedPermanently("ups!", "Location" -> "index.html")
   }
 
-//  val router: HttpRoutes[IO] = Router("" -> apiRoutes, "" -> redirect)
   val router: HttpRoutes[IO] = Router(
     "" -> Http4sServerInterpreter[IO]().toRoutes(
         getExpense ::
@@ -75,7 +64,6 @@ object HelloWorldHttp4sServer extends IOApp {
         static ::
         Nil
     )
-//    "" -> Http4sServerInterpreter[IO]().toRoutes(getExpense)
   )
 
   override def run(args: List[String]): IO[ExitCode] =
