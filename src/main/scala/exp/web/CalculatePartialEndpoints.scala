@@ -12,7 +12,7 @@ import io.circe.generic.auto._
 import sttp.tapir.model.UsernamePassword
 import sttp.tapir.server.PartialServerEndpoint
 
-object CalculateEndpoints {
+object CalculatePartialEndpoints {
 
   sealed trait CalculationError
 

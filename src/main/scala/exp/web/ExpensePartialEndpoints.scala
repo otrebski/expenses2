@@ -7,7 +7,7 @@ import sttp.tapir._
 import sttp.tapir.generic.auto._
 import sttp.tapir.json.circe._
 
-object ExpenseEndpoints {
+object ExpensePartialEndpoints {
 
   trait RequestError
   case class RequestAuthenticationError(wrapped: AuthenticationError) extends RequestError
