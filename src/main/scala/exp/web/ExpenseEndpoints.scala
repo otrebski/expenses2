@@ -2,18 +2,16 @@ package exp.web
 
 import cats.effect.IO
 import cats.effect.Sync
-import exp.model.Model
-import exp.model.Model.Genre
-import sttp.model.headers.WWWAuthenticateChallenge
-import sttp.tapir.model.UsernamePassword
 import cats.syntax.all._
-import sttp.tapir.server.PartialServerEndpoint
+import exp.model.Model
+import io.circe.generic.auto._
+import sttp.tapir._
+import sttp.tapir.generic.auto._
+import sttp.tapir.json.circe._
+import sttp.tapir.model.UsernamePassword
 
 object ExpenseEndpoints {
-  import io.circe.generic.auto._
-  import sttp.tapir._
-  import sttp.tapir.json.circe._
-  import sttp.tapir.generic.auto._
+
 
   case class User(name: String)
   case class AuthenticationToken(value: String)
