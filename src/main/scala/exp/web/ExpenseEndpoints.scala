@@ -9,7 +9,7 @@ import sttp.tapir.model.UsernamePassword
 import cats.syntax.all._
 import sttp.tapir.server.PartialServerEndpoint
 
-object Endpoints {
+object ExpenseEndpoints {
   import io.circe.generic.auto._
   import sttp.tapir._
   import sttp.tapir.json.circe._

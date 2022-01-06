@@ -10,10 +10,10 @@ import exp.model.Model.Expense
 import exp.model.Model.Note
 import exp.model.Model.Purpose
 import exp.service.ExpenseService
-import exp.web.Endpoints
-import exp.web.Endpoints.Other
-import exp.web.Endpoints.RequestError
-import exp.web.Endpoints.editExpense
+import exp.web.ExpenseEndpoints
+import exp.web.ExpenseEndpoints.Other
+import exp.web.ExpenseEndpoints.RequestError
+import exp.web.ExpenseEndpoints.editExpense
 import org.http4s.server.Router
 import org.http4s.blaze.server.BlazeServerBuilder
 import sttp.tapir._
@@ -37,15 +37,15 @@ object HelloWorldHttp4sServer extends IOApp {
   val static: ServerEndpoint[Any, IO] = resourcesGetServerEndpoint[IO](endpoint.input)(this.getClass.getClassLoader, "static")
 
   private val getExpense =
-    Endpoints
+    ExpenseEndpoints
       .getExpense
       .serverLogic(user => id => expenseService.find(Expense.Id(id)).map(_.toRight(Other("Not found"))))
 
   private val editExpense =
-    Endpoints.editExpense.serverLogic(user => { case (id, expense) => expenseService.edit(expense).map(_.asRight[RequestError]) })
-  private val addExpense = Endpoints.addExpense.serverLogic(user => expense => expenseService.add(expense).map(_.asRight[RequestError]))
+    ExpenseEndpoints.editExpense.serverLogic(user => { case (id, expense) => expenseService.edit(expense).map(_.asRight[RequestError]) })
+  private val addExpense = ExpenseEndpoints.addExpense.serverLogic(user => expense => expenseService.add(expense).map(_.asRight[RequestError]))
   private val deleteExpense =
-    Endpoints.deleteExpense.serverLogic(user => id => expenseService.delete(Expense.Id(id)).map(_.asRight[RequestError]))
+    ExpenseEndpoints.deleteExpense.serverLogic(user => id => expenseService.delete(Expense.Id(id)).map(_.asRight[RequestError]))
 
   private val endpoints: List[ServerEndpoint[Any, IO]] = List(
     helloWorld.serverLogic(name => IO(s"Hello, $name!".asRight[Unit])),
