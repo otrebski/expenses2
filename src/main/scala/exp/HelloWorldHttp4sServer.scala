@@ -68,7 +68,6 @@ object HelloWorldHttp4sServer extends IOApp {
 //  val router: HttpRoutes[IO] = Router("" -> apiRoutes, "" -> redirect)
   val router: HttpRoutes[IO] = Router(
     "" -> Http4sServerInterpreter[IO]().toRoutes(
-      listBooks ::
         getExpense ::
         addExpense ::
         deleteExpense ::
