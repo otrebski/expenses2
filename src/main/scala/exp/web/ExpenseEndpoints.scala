@@ -4,6 +4,7 @@ import cats.effect.IO
 import cats.effect.Sync
 import cats.syntax.all._
 import exp.model.Model
+import exp.web.Authentication.AuthenticationError
 import io.circe.generic.auto._
 import sttp.tapir._
 import sttp.tapir.generic.auto._
@@ -12,24 +13,14 @@ import sttp.tapir.model.UsernamePassword
 
 object ExpenseEndpoints {
 
-
-  case class User(name: String)
-  case class AuthenticationToken(value: String)
-  case class AuthenticationError(code: Int)
   trait RequestError
   case class RequestAuthenticationError(wrapped: AuthenticationError) extends RequestError
   case class Other(msg: String) extends RequestError
 
-  private def authLogic[F[_]: Sync](usernamePassword: UsernamePassword): F[Either[AuthenticationError, User]] = usernamePassword match {
-    case UsernamePassword("a",Some("a")) => User("a").asRight[AuthenticationError].pure[F]
-    case _ => AuthenticationError(1001).asLeft[User].pure[F]
-  }
-
-
   private val secureEndpoint = endpoint
     .securityIn(auth.basic[UsernamePassword]())
     .errorOut(plainBody[Int].map[AuthenticationError](i => AuthenticationError(i))(_.code))
-    .serverSecurityLogic(t => authLogic[IO](t))
+    .serverSecurityLogic(t => Authentication.authLogic[IO](t))
     .mapErrorOut(RequestAuthenticationError)(_.wrapped)
     .errorOutVariant[RequestError](oneOfVariant(stringBody.mapTo[Other]))
 
