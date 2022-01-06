@@ -5,7 +5,7 @@ import cats.syntax.all._
 import exp.model.Model.{CalculateRequest, CalculateResult, Expense}
 import exp.service.{CalculateService, ExpenseService}
 import exp.web.CalculatePartialEndpoints.CalculationError
-import exp.web.{CalculateFullEndpoints, CalculatePartialEndpoints, ExpensePartialEndpoints}
+import exp.web.{CalculateFullEndpoints, CalculatePartialEndpoints, ExpenseLogic, ExpensePartialEndpoints}
 import exp.web.ExpensePartialEndpoints.Other
 import exp.web.ExpensePartialEndpoints.RequestError
 import org.http4s.server.Router
@@ -30,18 +30,11 @@ object RestApp extends IOApp {
 
   val static: ServerEndpoint[Any, IO] = resourcesGetServerEndpoint[IO](endpoint.input)(this.getClass.getClassLoader, "static")
 
-  private val getExpense =
-    ExpensePartialEndpoints
-      .get
-      .serverLogic(user => id => expenseService.find(Expense.Id(id)).map(_.toRight(Other("Not found"))))
+  private val getExpense = ExpensePartialEndpoints.get.serverLogic(ExpenseLogic.get(expenseService))
 
-  private val editExpense =
-    ExpensePartialEndpoints.edit.serverLogic(user => {
-      case (id, expense) => expenseService.edit(expense).map(_.asRight[RequestError])
-    })
-  private val addExpense = ExpensePartialEndpoints.add.serverLogic(user => expense => expenseService.add(expense).map(_.asRight[RequestError]))
-  private val deleteExpense =
-    ExpensePartialEndpoints.delete.serverLogic(user => id => expenseService.delete(Expense.Id(id)).map(_.asRight[RequestError]))
+  private val editExpense = ExpensePartialEndpoints.edit.serverLogic(ExpenseLogic.edit(expenseService))
+  private val addExpense = ExpensePartialEndpoints.add.serverLogic(ExpenseLogic.add(expenseService))
+  private val deleteExpense = ExpensePartialEndpoints.delete.serverLogic(ExpenseLogic.delete(expenseService))
 
   import org.http4s.dsl.io._
 
