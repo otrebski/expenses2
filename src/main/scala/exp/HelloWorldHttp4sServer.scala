@@ -29,14 +29,14 @@ object HelloWorldHttp4sServer extends IOApp {
 
   private val getExpense =
     ExpenseEndpoints
-      .getExpense
+      .get
       .serverLogic(user => id => expenseService.find(Expense.Id(id)).map(_.toRight(Other("Not found"))))
 
   private val editExpense =
-    ExpenseEndpoints.editExpense.serverLogic(user => { case (id, expense) => expenseService.edit(expense).map(_.asRight[RequestError]) })
-  private val addExpense = ExpenseEndpoints.addExpense.serverLogic(user => expense => expenseService.add(expense).map(_.asRight[RequestError]))
+    ExpenseEndpoints.edit.serverLogic(user => { case (id, expense) => expenseService.edit(expense).map(_.asRight[RequestError]) })
+  private val addExpense = ExpenseEndpoints.add.serverLogic(user => expense => expenseService.add(expense).map(_.asRight[RequestError]))
   private val deleteExpense =
-    ExpenseEndpoints.deleteExpense.serverLogic(user => id => expenseService.delete(Expense.Id(id)).map(_.asRight[RequestError]))
+    ExpenseEndpoints.delete.serverLogic(user => id => expenseService.delete(Expense.Id(id)).map(_.asRight[RequestError]))
 
   private val endpoints: List[ServerEndpoint[Any, IO]] = List(
     helloWorld.serverLogic(name => IO(s"Hello, $name!".asRight[Unit])),

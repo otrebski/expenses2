@@ -38,30 +38,30 @@ object ExpenseEndpoints {
   private val baseExpenseEndpoint = secureEndpoint
     .in("api" / "expenses")
 
-  val getExpense = baseExpenseEndpoint
+  val get = baseExpenseEndpoint
     .get
     .in("id" / path[Long]("id"))
     .out(jsonBody[Model.Expense])
 
-  val addExpense = baseExpenseEndpoint
+  val add = baseExpenseEndpoint
     .put
     .in(jsonBody[Model.ExpenseToAdd])
     .out(jsonBody[Model.Expense])
 
-  val editExpense = baseExpenseEndpoint
+  val edit = baseExpenseEndpoint
     .post
     .in("id" / path[Long]("id"))
     .in(jsonBody[Model.Expense])
     .out(jsonBody[Model.Expense])
 
-  val deleteExpense = baseExpenseEndpoint
+  val delete = baseExpenseEndpoint
     .delete
     .in("id" / path[Long]("id"))
 
-  val all = getExpense ::
-    addExpense ::
-    editExpense ::
-    deleteExpense ::
+  val all = get ::
+    add ::
+    edit ::
+    delete ::
     Nil
 
 }
