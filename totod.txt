@@ -1,0 +1,41 @@
+API:
+Expense: "api" / "expenses"
+- PUT (LIST) add
+- PUT (SINGLE) add
+- DELETE "id"/Longnubmer
+- POST "id"/Longnubmer
+- GET "id"/Longnubmer
+
+Month/Year:
+- "api" / "expenses" / "date" / Segment (Date 2021-01)
+
+Note:
+ - POST "api" / "notes"
+
+Purposes:
+ - ("api" / "purposes" / Segments(0, 1)
+
+Summary:
+- "api" / "summary" / "from" / Segment / "to" / Segment
+  - "purpose" / Segment / "note" / Segment
+  - "note" / Segment / "purpose" / Segment
+  - "purpose" / Segment
+  - "note" / Segment
+
+
+Search:
+- ("api" / "expenses" / "search" / "from" / Segment / "to" / Segment
+        val b = Date(to)
+        path("purpose" / Segment / "note" / Segment) {
+        path("note" / Segment / "purpose" / Segment) {
+        path("purpose" / Segment) {
+        path("note" / Segment) {
+
+Templates:
+- "api" / "expenses" / "templates"
+  - GET
+  - id/ LongNumber (delte)
+  - PUT
+
+Calculate:
+- "api" / "calculate"
