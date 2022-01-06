@@ -13,6 +13,10 @@ lazy val root = (project in file(".")).settings(
     "org.typelevel" %% "cats-effect-kernel" % "3.3.0",
     // standard "effect" library (Queues, Console, Random etc.)
     "org.typelevel" %% "cats-effect-std" % "3.3.0",
+
+    //Expression calucaltor
+    "com.udojava" % "EvalEx" % "2.7",
+
     "org.typelevel" %% "munit-cats-effect-3" % "1.0.7" % Test,
     //Circe
     "io.circe" %% "circe-generic-extras" % "0.14.1",

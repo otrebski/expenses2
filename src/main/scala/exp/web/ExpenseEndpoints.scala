@@ -1,15 +1,11 @@
 package exp.web
 
-import cats.effect.IO
-import cats.effect.Sync
-import cats.syntax.all._
 import exp.model.Model
 import exp.web.Authentication.AuthenticationError
 import io.circe.generic.auto._
 import sttp.tapir._
 import sttp.tapir.generic.auto._
 import sttp.tapir.json.circe._
-import sttp.tapir.model.UsernamePassword
 
 object ExpenseEndpoints {
 
@@ -17,10 +13,7 @@ object ExpenseEndpoints {
   case class RequestAuthenticationError(wrapped: AuthenticationError) extends RequestError
   case class Other(msg: String) extends RequestError
 
-  private val secureEndpoint = endpoint
-    .securityIn(auth.basic[UsernamePassword]())
-    .errorOut(plainBody[Int].map[AuthenticationError](i => AuthenticationError(i))(_.code))
-    .serverSecurityLogic(t => Authentication.authLogic[IO](t))
+  private val secureEndpoint = Authentication.secureEndpoint
     .mapErrorOut(RequestAuthenticationError)(_.wrapped)
     .errorOutVariant[RequestError](oneOfVariant(stringBody.mapTo[Other]))
 

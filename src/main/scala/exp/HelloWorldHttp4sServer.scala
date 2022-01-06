@@ -2,9 +2,10 @@ package exp
 
 import cats.effect._
 import cats.syntax.all._
-import exp.model.Model.Expense
-import exp.service.ExpenseService
-import exp.web.ExpenseEndpoints
+import exp.model.Model.{CalculateRequest, CalculateResult, Expense}
+import exp.service.{CalculateService, ExpenseService}
+import exp.web.CalculateEndpoints.CalculationError
+import exp.web.{CalculateEndpoints, ExpenseEndpoints}
 import exp.web.ExpenseEndpoints.Other
 import exp.web.ExpenseEndpoints.RequestError
 import org.http4s.server.Router
@@ -38,16 +39,8 @@ object HelloWorldHttp4sServer extends IOApp {
   private val deleteExpense =
     ExpenseEndpoints.delete.serverLogic(user => id => expenseService.delete(Expense.Id(id)).map(_.asRight[RequestError]))
 
-  private val endpoints: List[ServerEndpoint[Any, IO]] = List(
-    helloWorld.serverLogic(name => IO(s"Hello, $name!".asRight[Unit])),
-    static,
-    getExpense,
-    editExpense,
-    addExpense,
-    deleteExpense
-  )
-
-  val apiRoutes: HttpRoutes[IO] = Http4sServerInterpreter[IO]().toRoutes(endpoints)
+  private val calculate = CalculateEndpoints.calculate
+    .serverLogic(_ => request => CalculateService.calculate(request).asRight[CalculationError].pure[IO])
 
   import org.http4s.dsl.io._
 
@@ -61,6 +54,7 @@ object HelloWorldHttp4sServer extends IOApp {
         addExpense ::
         deleteExpense ::
         editExpense ::
+          calculate::
         static ::
         Nil
     )
