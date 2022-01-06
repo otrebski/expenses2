@@ -36,16 +36,6 @@ object Endpoints {
     .mapErrorOut(RequestAuthenticationError)(_.wrapped)
     .errorOutVariant[RequestError](oneOfVariant(stringBody.mapTo[Other]))
 
-  val book: Model.Book =
-    Model.Book(title = "T", genre = Genre("genre", "genre desc"), year = 2021, author = Model.Author("John", Model.Country("PL")))
-
-  val get = secureEndpoint
-    .in("books" / "get")
-    .out(jsonBody[Model.Book].example(book))
-
-  val list = secureEndpoint
-    .in("books" / "list")
-    .out(jsonBody[List[Model.Book]].example(List(book)))
 
   //api/expenses/id/12886
   private val baseExpenseEndpoint = secureEndpoint
@@ -75,8 +65,6 @@ object Endpoints {
     addExpense ::
     editExpense ::
     deleteExpense ::
-    list ::
-    get ::
     Nil
 
 }

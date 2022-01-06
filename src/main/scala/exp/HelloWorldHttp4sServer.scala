@@ -36,10 +36,6 @@ object HelloWorldHttp4sServer extends IOApp {
   import org.http4s._
   val static: ServerEndpoint[Any, IO] = resourcesGetServerEndpoint[IO](endpoint.input)(this.getClass.getClassLoader, "static")
 
-  private val listBooks = Endpoints
-    .list
-    .serverLogic(username => _ => IO.println(s"Request for $username") *> IO(List(Endpoints.book).asRight))
-
   private val getExpense =
     Endpoints
       .getExpense
@@ -54,10 +50,6 @@ object HelloWorldHttp4sServer extends IOApp {
   private val endpoints: List[ServerEndpoint[Any, IO]] = List(
     helloWorld.serverLogic(name => IO(s"Hello, $name!".asRight[Unit])),
     static,
-    listBooks,
-    Endpoints
-      .get
-      .serverLogic(username => _ => IO.println(s"Request for $username") *> IO(Endpoints.book.asRight)),
     getExpense,
     editExpense,
     addExpense,
