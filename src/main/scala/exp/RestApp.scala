@@ -20,7 +20,7 @@ object RestApp extends IOApp {
   // the endpoint: single fixed path input ("hello"), single query parameter
   // corresponds to: GET /hello?name=...
 
-  val expenseService = ExpenseService.mockInstance[IO]()
+  val expenseService: ExpenseService[IO] = ExpenseService.mockInstance[IO]()
   val helloWorld: PublicEndpoint[String, Unit, String, Any] =
     endpoint.get.in("hello").in(query[String]("name")).out(stringBody)
 
@@ -36,6 +36,10 @@ object RestApp extends IOApp {
   private val addExpense = ExpensePartialEndpoints.add.serverLogic(ExpenseLogic.add(expenseService))
   private val deleteExpense = ExpensePartialEndpoints.delete.serverLogic(ExpenseLogic.delete(expenseService))
 
+  private val monthSummary = ExpensePartialEndpoints.listInterval.serverLogic(ExpenseLogic.monthSummary(expenseService))
+
+  println(ExpensePartialEndpoints.listInterval.renderPathTemplate())
+
   import org.http4s.dsl.io._
 
   val redirect: HttpRoutes[IO] = HttpRoutes.of[IO] {
@@ -48,6 +52,7 @@ object RestApp extends IOApp {
         addExpense ::
         deleteExpense ::
         editExpense ::
+        monthSummary ::
         CalculateFullEndpoints.calculate ::
         static ::
         Nil

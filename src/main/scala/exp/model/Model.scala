@@ -55,7 +55,6 @@ object Model {
 
   case class Date(year: Int, month: Int)
 
-
   case class CalculateRequest(expression: String)
 
   sealed trait CalculateResult
@@ -63,5 +62,10 @@ object Model {
   case class SuccessfulCalculateResult(result: BigDecimal, expression: String, success: Boolean = true) extends CalculateResult
 
   case class FailureCalculateResult(expression: String, error: String, success: Boolean = false) extends CalculateResult
+
+  case class ExpenseSummary(purpose: String, amount: BigDecimal)
+
+  case class ExpenseReport(expenseSummary: List[ExpenseSummary], expenses: List[Expense])
+
 
 }
