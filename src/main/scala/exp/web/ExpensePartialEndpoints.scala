@@ -2,7 +2,7 @@ package exp.web
 
 import cats.effect.IO
 import exp.model.Model
-import exp.model.Model.{Date, ExpenseReport, NotesSuggestionRequest, NotesSuggestionResponse}
+import exp.model.Model.{Date, ExpenseReport, NotesSuggestionRequest, NotesSuggestionResponse, Purpose}
 import exp.web.Authentication.AuthenticationError
 import io.circe.generic.auto._
 import sttp.tapir._
@@ -23,15 +23,17 @@ object ExpensePartialEndpoints {
   private implicit val dateCodec: Codec[String, Date, TextPlain] = Codec.string
     .map(s => Date(s.split("-")(0).toInt, s.split("-")(1).toInt))(d => s"${d.year}-${d.month}")
 
+  private implicit val purposeCodec: Codec[String, Purpose, TextPlain] = Codec.string.map(Purpose(_))(_.value)
+
 
   private val secureEndpoint = Authentication.secureEndpoint
     .mapErrorOut(RequestAuthenticationError)(_.wrapped)
     .errorOutVariant[RequestError](oneOfVariant(stringBody.mapTo[Other]))
 
 
-  //api/expenses/id/12886
-  private val baseExpenseEndpoint = secureEndpoint
-    .in("api" / "expenses")
+  private val apiEndpoint = secureEndpoint.in("api")
+
+  private val baseExpenseEndpoint = apiEndpoint.in("expenses")
 
   val get: PartialServerEndpoint[UsernamePassword, Authentication.User, Long, RequestError, Model.Expense, Any, IO] = baseExpenseEndpoint
     .get
@@ -67,12 +69,19 @@ object ExpensePartialEndpoints {
     .out(jsonBody[ExpenseReport])
 
 
-  val notes: PartialServerEndpoint[UsernamePassword, Authentication.User, NotesSuggestionRequest, RequestError, NotesSuggestionResponse, Any, IO] = secureEndpoint
+  val notes: PartialServerEndpoint[UsernamePassword, Authentication.User, NotesSuggestionRequest, RequestError, NotesSuggestionResponse, Any, IO] = apiEndpoint
     .post
-    .in("api")
     .in("notes")
     .in(jsonBody[NotesSuggestionRequest])
     .out(jsonBody[NotesSuggestionResponse])
 
+  val allPurposes: PartialServerEndpoint[UsernamePassword, Authentication.User, Unit, RequestError, List[Purpose], Any, IO] = apiEndpoint
+    .in("purposes")
+    .out(jsonBody[List[Purpose]])
+
+  val purposes: PartialServerEndpoint[UsernamePassword, Authentication.User, Purpose, RequestError, List[Purpose], Any, IO] = apiEndpoint
+    .in("purposes")
+    .in(path[Purpose]("purpose"))
+    .out(jsonBody[List[Purpose]])
 
 }

@@ -1,18 +1,18 @@
 API:
-Expense: "api" / "expenses"
+✔ Expense: "api" / "expenses"
 - PUT (LIST) add
 - PUT (SINGLE) add
 - DELETE "id"/Longnubmer
 - POST "id"/Longnubmer
 - GET "id"/Longnubmer
 
-Month/Year:
+✔ Month/Year:
 - "api" / "expenses" / "date" / Segment (Date 2021-01)
 
-Note:
+✔ Note:
  - POST "api" / "notes"
 
-Purposes:
+✔ Purposes:
  - ("api" / "purposes" / Segments(0, 1)
 
 Summary:

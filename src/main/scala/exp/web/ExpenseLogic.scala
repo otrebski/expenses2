@@ -4,7 +4,7 @@ import cats.{Applicative, Functor}
 import exp.model.Model.{Date, Expense, ExpenseReport, ExpenseSummary, ExpenseToAdd, Note, NotesSuggestionRequest, NotesSuggestionResponse, Purpose}
 import exp.service.{ExpenseService, NotesService}
 import exp.web.ExpensePartialEndpoints.{Other, RequestError}
-import cats.syntax.all._
+import cats.implicits._
 
 object ExpenseLogic {
 
@@ -13,7 +13,8 @@ object ExpenseLogic {
   }
 
   def add[F[_] : Functor](expenseService: ExpenseService[F]): Authentication.User => ExpenseToAdd => F[Either[RequestError, Expense]] = {
-    _ => expense => Functor[F].map(expenseService.add(expense))(_.asRight[RequestError])
+    _ => expense => expenseService.add(expense).map(_.asRight[RequestError])
+
   }
 
   def delete[F[_] : Functor](expenseService: ExpenseService[F]): Authentication.User => Long => F[Either[RequestError, Unit]] = {
@@ -44,7 +45,11 @@ object ExpenseLogic {
   }
 
   def notes[F[_] : Applicative](notesService: NotesService[F]): Authentication.User => NotesSuggestionRequest => F[Either[RequestError, NotesSuggestionResponse]] = {
-    _ => request => notesService.notesSuggestions(Purpose(request.purpose), Note(request.note)).map (list => NotesSuggestionResponse(list).asRight[RequestError])
+    _ => request => notesService.notesSuggestions(Purpose(request.purpose), Note(request.note)).map(list => NotesSuggestionResponse(list).asRight[RequestError])
   }
+
+  def purposes[F[_] : Functor](expenseService: ExpenseService[F]): Authentication.User => Purpose => F[Either[RequestError, List[Purpose]]] = _ => purpose => expenseService.purposes(purpose).map(_.asRight[RequestError])
+
+  def allPurposes[F[_] : Functor](expenseService: ExpenseService[F]): Authentication.User => Unit => F[Either[RequestError, List[Purpose]]] = _ => _ => expenseService.purposes().map(_.asRight[RequestError])
 
 }

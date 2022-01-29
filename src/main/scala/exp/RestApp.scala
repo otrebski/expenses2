@@ -41,6 +41,8 @@ object RestApp extends IOApp {
   private val monthSummary = ExpensePartialEndpoints.listInterval.serverLogic(ExpenseLogic.monthSummary(expenseService))
 
   private val notes = ExpensePartialEndpoints.notes.serverLogic(ExpenseLogic.notes(notesService))
+  private val allPurposes = ExpensePartialEndpoints.allPurposes.serverLogic(ExpenseLogic.allPurposes(expenseService))
+  private val purposes = ExpensePartialEndpoints.purposes.serverLogic(ExpenseLogic.purposes(expenseService))
 
 
   import org.http4s.dsl.io._
@@ -57,6 +59,8 @@ object RestApp extends IOApp {
         editExpense ::
         monthSummary ::
         notes ::
+        purposes ::
+        allPurposes ::
         CalculateFullEndpoints.calculate ::
         static ::
         Nil
