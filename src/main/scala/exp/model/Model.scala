@@ -67,5 +67,10 @@ object Model {
 
   case class ExpenseReport(expenseSummary: List[ExpenseSummary], expenses: List[Expense])
 
+  case class NotesSuggestionRequest(purpose: String, note: String)
+
+  case class NotesSuggestionResponse(suggestions: List[Suggestion])
+
+  case class Suggestion(suggestion: String, count: Int)
 
 }

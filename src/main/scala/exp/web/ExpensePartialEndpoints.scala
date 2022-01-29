@@ -2,7 +2,7 @@ package exp.web
 
 import cats.effect.IO
 import exp.model.Model
-import exp.model.Model.{Date, ExpenseReport}
+import exp.model.Model.{Date, ExpenseReport, NotesSuggestionRequest, NotesSuggestionResponse}
 import exp.web.Authentication.AuthenticationError
 import io.circe.generic.auto._
 import sttp.tapir._
@@ -15,12 +15,14 @@ import sttp.tapir.CodecFormat.TextPlain
 object ExpensePartialEndpoints {
 
   trait RequestError
+
   case class RequestAuthenticationError(wrapped: AuthenticationError) extends RequestError
+
   case class Other(msg: String) extends RequestError
 
   private implicit val dateCodec: Codec[String, Date, TextPlain] = Codec.string
-    .map(s => Date(s.split("-")(0).toInt,s.split("-")(1).toInt))(d=>s"${d.year}-${d.month}")
-    
+    .map(s => Date(s.split("-")(0).toInt, s.split("-")(1).toInt))(d => s"${d.year}-${d.month}")
+
 
   private val secureEndpoint = Authentication.secureEndpoint
     .mapErrorOut(RequestAuthenticationError)(_.wrapped)
@@ -57,13 +59,20 @@ object ExpensePartialEndpoints {
     .delete
     .in("id" / path[Long]("id"))
 
-  val singleExpenseEndpoints = List(get, add ,addList, edit , delete)
-
-  val all = singleExpenseEndpoints
+  val singleExpenseEndpoints = List(get, add, addList, edit, delete)
 
   val listInterval: PartialServerEndpoint[UsernamePassword, Authentication.User, Date, RequestError, ExpenseReport, Any, IO] = baseExpenseEndpoint
     .in("date")
     .in(path[Date]("date"))
     .out(jsonBody[ExpenseReport])
+
+
+  val notes: PartialServerEndpoint[UsernamePassword, Authentication.User, NotesSuggestionRequest, RequestError, NotesSuggestionResponse, Any, IO] = secureEndpoint
+    .post
+    .in("api")
+    .in("notes")
+    .in(jsonBody[NotesSuggestionRequest])
+    .out(jsonBody[NotesSuggestionResponse])
+
 
 }

@@ -3,7 +3,7 @@ package exp
 import cats.effect._
 import cats.syntax.all._
 import exp.model.Model.{CalculateRequest, CalculateResult, Expense}
-import exp.service.{CalculateService, ExpenseService}
+import exp.service.{CalculateService, ExpenseService, NotesService}
 import exp.web.CalculatePartialEndpoints.CalculationError
 import exp.web.{CalculateFullEndpoints, CalculatePartialEndpoints, ExpenseLogic, ExpensePartialEndpoints}
 import exp.web.ExpensePartialEndpoints.Other
@@ -21,6 +21,8 @@ object RestApp extends IOApp {
   // corresponds to: GET /hello?name=...
 
   val expenseService: ExpenseService[IO] = ExpenseService.mockInstance[IO]()
+  val notesService: NotesService[IO] = NotesService.mockInstance[IO]()
+
   val helloWorld: PublicEndpoint[String, Unit, String, Any] =
     endpoint.get.in("hello").in(query[String]("name")).out(stringBody)
 
@@ -38,7 +40,8 @@ object RestApp extends IOApp {
 
   private val monthSummary = ExpensePartialEndpoints.listInterval.serverLogic(ExpenseLogic.monthSummary(expenseService))
 
-  println(ExpensePartialEndpoints.listInterval.renderPathTemplate())
+  private val notes = ExpensePartialEndpoints.notes.serverLogic(ExpenseLogic.notes(notesService))
+
 
   import org.http4s.dsl.io._
 
@@ -53,6 +56,7 @@ object RestApp extends IOApp {
         deleteExpense ::
         editExpense ::
         monthSummary ::
+        notes ::
         CalculateFullEndpoints.calculate ::
         static ::
         Nil

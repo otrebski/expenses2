@@ -1,8 +1,8 @@
 package exp.web
 
 import cats.{Applicative, Functor}
-import exp.model.Model.{Date, Expense, ExpenseReport, ExpenseSummary, ExpenseToAdd, Note, Purpose}
-import exp.service.ExpenseService
+import exp.model.Model.{Date, Expense, ExpenseReport, ExpenseSummary, ExpenseToAdd, Note, NotesSuggestionRequest, NotesSuggestionResponse, Purpose}
+import exp.service.{ExpenseService, NotesService}
 import exp.web.ExpensePartialEndpoints.{Other, RequestError}
 import cats.syntax.all._
 
@@ -41,6 +41,10 @@ object ExpenseLogic {
 
         ExpenseReport(expenseSummary = summary, expenses = list).asRight[RequestError].pure[F]
       }
+  }
+
+  def notes[F[_] : Applicative](notesService: NotesService[F]): Authentication.User => NotesSuggestionRequest => F[Either[RequestError, NotesSuggestionResponse]] = {
+    _ => request => notesService.notesSuggestions(Purpose(request.purpose), Note(request.note)).map (list => NotesSuggestionResponse(list).asRight[RequestError])
   }
 
 }
