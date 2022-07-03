@@ -84,4 +84,6 @@ object ExpensePartialEndpoints {
     .in(path[Purpose]("purpose"))
     .out(jsonBody[List[Purpose]])
 
+
+  val endpoints: List[AnyEndpoint] = List(listInterval, notes, allPurposes, purposes, get, add, addList, edit, delete).map(_.endpoint)
 }
