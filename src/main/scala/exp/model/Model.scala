@@ -1,10 +1,12 @@
 package exp.model
 
 import io.circe.Codec
+import io.circe.Json.JString
 import io.circe._
 import io.circe.generic.semiauto._
-import io.circe.generic.extras.semiauto._
+//import io.circe.generic.extras.semiauto._
 import io.circe._, io.circe.generic.auto._, io.circe.parser._, io.circe.syntax._
+import io.circe.{Decoder, Encoder}
 
 object Model {
 
@@ -19,13 +21,15 @@ object Model {
   case class Purpose(value: String)
 
   object Purpose {
-    implicit val codec: Codec[Purpose] = deriveUnwrappedCodec
+    implicit val decoder: Decoder[Purpose] = Decoder.decodeString.map(s => Purpose(s))
+    implicit val encoder: Encoder[Purpose] = Encoder.instance(p => Json.fromString(p.value))
   }
 
   case class Note(value: String)
 
   object Note {
-    implicit val codec: Codec[Note] = deriveUnwrappedCodec
+    implicit val decoder: Decoder[Note] = Decoder.decodeString.map(s => Note(s))
+    implicit val encoder: Encoder[Note] = Encoder.instance(p => Json.fromString(p.value))
   }
 
   object Expense {
@@ -33,7 +37,8 @@ object Model {
     case class Id(value: Long)
 
     object Id {
-      implicit val codec: Codec[Id] = deriveUnwrappedCodec
+      implicit val decoder: Decoder[Id] = Decoder.decodeLong.map(s => Id(s))
+      implicit val encoder: Encoder[Id] = Encoder.instance(p => Json.fromLong(p.value))
     }
 
   }

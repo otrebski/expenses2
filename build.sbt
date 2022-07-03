@@ -1,5 +1,5 @@
 ThisBuild / organization := "com.example"
-ThisBuild / scalaVersion := "2.13.8"
+ThisBuild / scalaVersion := "3.1.2"
 
 val tapirVersion = "1.0.1"
 
@@ -19,7 +19,7 @@ lazy val root = (project in file(".")).settings(
 
     "org.typelevel" %% "munit-cats-effect-3" % "1.0.7" % Test,
     //Circe
-    "io.circe" %% "circe-generic-extras" % "0.14.2",
+//    "io.circe" %% "circe-generic-extras" % "0.14.2",
     //Tapir
     "com.softwaremill.sttp.tapir" %% "tapir-core" % tapirVersion,
     "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % tapirVersion,

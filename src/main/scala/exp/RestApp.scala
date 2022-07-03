@@ -2,7 +2,8 @@ package exp
 
 import cats.effect._
 import cats.syntax.all._
-import com.comcast.ip4s.IpLiteralSyntax
+import com.comcast.ip4s.Host
+import com.comcast.ip4s.Port
 import exp.model.Model
 import exp.model.Model.{CalculateRequest, CalculateResult, Expense}
 import exp.service.{CalculateService, ExpenseService, NotesService}
@@ -79,10 +80,11 @@ object RestApp extends IOApp {
   override def run(args: List[String]): IO[ExitCode] = {
     // starting the server
     import org.http4s.implicits._
+
     IO.println("Starting server") *>
       EmberServerBuilder.default[IO]
-        .withHost(ipv4"0.0.0.0")
-        .withPort(port"8080")
+        .withHost(Host.fromString("0.0.0.0").get)
+        .withPort(Port.fromInt(8080).get)
         .withHttpApp(router.orNotFound)
         .build
         .use(_ => IO.never[ExitCode])

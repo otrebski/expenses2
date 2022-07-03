@@ -27,7 +27,7 @@ object ExpensePartialEndpoints {
 
 
   private val secureEndpoint = Authentication.secureEndpoint
-    .mapErrorOut(RequestAuthenticationError)(_.wrapped)
+    .mapErrorOut(RequestAuthenticationError.apply)(_.wrapped)
     .errorOutVariant[RequestError](oneOfVariant(stringBody.mapTo[Other]))
 
 

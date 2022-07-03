@@ -21,7 +21,7 @@ object CalculatePartialEndpoints {
   case class Other(msg: String) extends CalculationError
 
   private val secureEndpoint = Authentication.secureEndpoint
-    .mapErrorOut(RequestAuthenticationError)(_.wrapped)
+    .mapErrorOut(RequestAuthenticationError.apply)(_.wrapped)
     .errorOutVariant[CalculationError](oneOfVariant(stringBody.mapTo[Other]))
 
   val calculate: PartialServerEndpoint[UsernamePassword, Authentication.User, CalculateRequest, CalculationError, CalculateResult, Any, IO] = secureEndpoint
