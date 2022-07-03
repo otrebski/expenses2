@@ -2,6 +2,7 @@ package exp
 
 import cats.effect._
 import cats.syntax.all._
+import com.comcast.ip4s.IpLiteralSyntax
 import exp.model.Model.{CalculateRequest, CalculateResult, Expense}
 import exp.service.{CalculateService, ExpenseService, NotesService}
 import exp.web.CalculatePartialEndpoints.CalculationError
@@ -9,7 +10,7 @@ import exp.web.{CalculateFullEndpoints, CalculatePartialEndpoints, ExpenseLogic,
 import exp.web.ExpensePartialEndpoints.Other
 import exp.web.ExpensePartialEndpoints.RequestError
 import org.http4s.server.Router
-import org.http4s.blaze.server.BlazeServerBuilder
+import org.http4s.ember.server._
 import sttp.tapir._
 import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.server.http4s.Http4sServerInterpreter
@@ -67,17 +68,17 @@ object RestApp extends IOApp {
     )
   )
 
-  override def run(args: List[String]): IO[ExitCode] =
+  override def run(args: List[String]): IO[ExitCode] = {
   // starting the server
+    import org.http4s.implicits._
     IO.println("Starting server") *>
-      BlazeServerBuilder[IO]
-        .withExecutionContext(ec)
-        .bindHttp(8080, "0.0.0.0")
-        .withHttpApp(router.orNotFound)
-        .resource
-        .use { _ =>
-          IO.never[ExitCode]
-        }
-        .as(ExitCode.Success)
+    EmberServerBuilder.default[IO]
+      .withHost(ipv4"0.0.0.0")
+      .withPort(port"8080")
+      .withHttpApp(router.orNotFound)
+      .build
+      .use(_ => IO.never[ExitCode])
+      .as(ExitCode.Success)
+  }
 
 }
