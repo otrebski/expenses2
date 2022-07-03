@@ -11,6 +11,7 @@ import sttp.tapir.json.circe._
 import sttp.tapir.model.UsernamePassword
 import sttp.tapir.server.PartialServerEndpoint
 import sttp.tapir.CodecFormat.TextPlain
+import TapirCodecs._
 
 object ExpensePartialEndpoints {
 
@@ -19,11 +20,6 @@ object ExpensePartialEndpoints {
   case class RequestAuthenticationError(wrapped: AuthenticationError) extends RequestError
 
   case class Other(msg: String) extends RequestError
-
-  private implicit val dateCodec: Codec[String, Date, TextPlain] = Codec.string
-    .map(s => Date(s.split("-")(0).toInt, s.split("-")(1).toInt))(d => s"${d.year}-${d.month}")
-
-  private implicit val purposeCodec: Codec[String, Purpose, TextPlain] = Codec.string.map(Purpose(_))(_.value)
 
 
   private val secureEndpoint = Authentication.secureEndpoint

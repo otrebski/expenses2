@@ -1,19 +1,19 @@
 package exp
 
-import cats.effect._
-import cats.syntax.all._
+import cats.effect.*
+import cats.syntax.all.*
 import com.comcast.ip4s.Host
 import com.comcast.ip4s.Port
 import exp.model.Model
 import exp.model.Model.{CalculateRequest, CalculateResult, Expense}
 import exp.service.{CalculateService, ExpenseService, NotesService}
 import exp.web.CalculatePartialEndpoints.CalculationError
-import exp.web.{Authentication, CalculateFullEndpoints, CalculatePartialEndpoints, ExpenseLogic, ExpensePartialEndpoints}
+import exp.web.{Authentication, CalculateFullEndpoints, CalculatePartialEndpoints, ExpenseLogic, ExpensePartialEndpoints, SummaryLogic, SummaryPartialEndpoints}
 import exp.web.ExpensePartialEndpoints.Other
 import exp.web.ExpensePartialEndpoints.RequestError
 import org.http4s.server.Router
-import org.http4s.ember.server._
-import sttp.tapir._
+import org.http4s.ember.server.*
+import sttp.tapir.*
 import sttp.tapir.model.UsernamePassword
 import sttp.tapir.server.{PartialServerEndpoint, ServerEndpoint}
 import sttp.tapir.server.http4s.Http4sServerInterpreter
@@ -49,6 +49,11 @@ object RestApp extends IOApp {
   private val allPurposes = ExpensePartialEndpoints.allPurposes.serverLogic(ExpenseLogic.allPurposes(expenseService))
   private val purposes = ExpensePartialEndpoints.purposes.serverLogic(ExpenseLogic.purposes(expenseService))
 
+  private val summary = SummaryPartialEndpoints.summary.serverLogic {
+    user => {
+      case (since, until) => expenseService.summary(since, until).map(Right(_))
+    }
+  }
 
   import org.http4s.dsl.io._
 
@@ -56,7 +61,7 @@ object RestApp extends IOApp {
     case GET -> Root => MovedPermanently("ups!", "Location" -> "index.html")
   }
 
-  val swagger: List[ServerEndpoint[Any, IO]] = SwaggerInterpreter().fromEndpoints[IO](ExpensePartialEndpoints.endpoints, "title", "v1")
+  val swagger: List[ServerEndpoint[Any, IO]] = SwaggerInterpreter().fromEndpoints[IO](ExpensePartialEndpoints.endpoints ::: SummaryPartialEndpoints.endpoints, "title", "v1")
   val swaggerRoutes: HttpRoutes[IO] = Http4sServerInterpreter[IO]().toRoutes(swagger)
 
   val router: HttpRoutes[IO] = Router(
@@ -70,6 +75,7 @@ object RestApp extends IOApp {
         purposes ::
         allPurposes ::
         CalculateFullEndpoints.calculate ::
+        summary ::
         static ::
         Nil
     ),

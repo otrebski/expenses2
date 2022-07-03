@@ -60,6 +60,18 @@ object Model {
 
   case class Date(year: Int, month: Int)
 
+  object Date {
+    implicit class DateOps(date: Date) {
+      def >(otherDate: Date): Boolean = (date.year * 100 + date.month) > (otherDate.year * 100 + otherDate.month)
+
+      def >=(otherDate: Date): Boolean = (date.year * 100 + date.month) >= (otherDate.year * 100 + otherDate.month)
+
+      def <(otherDate: Date): Boolean = (date.year * 100 + date.month) < (otherDate.year * 100 + otherDate.month)
+
+      def <=(otherDate: Date): Boolean = (date.year * 100 + date.month) <= (otherDate.year * 100 + otherDate.month)
+    }
+  }
+
   case class CalculateRequest(expression: String)
 
   sealed trait CalculateResult
@@ -69,6 +81,10 @@ object Model {
   case class FailureCalculateResult(expression: String, error: String, success: Boolean = false) extends CalculateResult
 
   case class ExpenseSummary(purpose: String, amount: BigDecimal)
+
+  object ExpenseSummary {
+    implicit val coded: Codec[ExpenseSummary] = deriveCodec
+  }
 
   case class ExpenseReport(expenseSummary: List[ExpenseSummary], expenses: List[Expense])
 

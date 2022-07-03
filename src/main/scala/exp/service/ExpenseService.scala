@@ -1,8 +1,8 @@
 package exp.service
 
 import cats.Applicative
-import exp.model.Model.{Expense, ExpenseToAdd, Purpose}
-import cats.implicits._
+import exp.model.Model.{Date, Expense, ExpenseSummary, ExpenseToAdd, Purpose}
+import cats.implicits.*
 
 trait ExpenseService[F[_]] {
 
@@ -17,6 +17,8 @@ trait ExpenseService[F[_]] {
   def purposes(purpose: Purpose): F[List[Purpose]]
 
   def purposes(): F[List[Purpose]]
+
+  def summary(since: Date, until: Date): F[List[ExpenseSummary]]
 }
 
 object ExpenseService {
@@ -57,6 +59,17 @@ object ExpenseService {
       override def purposes(): F[List[Purpose]] = List("abcd", "asdf", "asdcv")
         .map(Purpose(_))
         .pure[F]
+
+      override def summary(since: Date, until: Date): F[List[ExpenseSummary]] =
+        data
+          .values
+          .filter(_.date >= since)
+          .filter(_.date <= until)
+          .groupBy(_.purpose)
+          .view.mapValues(_.map(_.amount).sum)
+          .map { case (purpose, amount) => ExpenseSummary(purpose = purpose.value, amount = amount) }
+          .toList
+          .pure[F]
     }
 
 }
