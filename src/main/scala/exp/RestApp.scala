@@ -62,7 +62,8 @@ object RestApp extends IOApp {
     case GET -> Root => MovedPermanently("ups!", "Location" -> "index.html")
   }
 
-  val swagger: List[ServerEndpoint[Any, IO]] = SwaggerInterpreter().fromEndpoints[IO](ExpensePartialEndpoints.endpoints ::: SummaryPartialEndpoints.endpoints, "title", "v1")
+  val swagger: List[ServerEndpoint[Any, IO]] = SwaggerInterpreter().fromEndpoints[IO](ExpensePartialEndpoints.endpoints :::
+    SummaryPartialEndpoints.endpoints, "title", "v1")
   val swaggerRoutes: HttpRoutes[IO] = Http4sServerInterpreter[IO]().toRoutes(swagger)
 
   val router: HttpRoutes[IO] = Router(
@@ -80,7 +81,8 @@ object RestApp extends IOApp {
         static ::
         Nil
     ),
-    "" -> swaggerRoutes
+    "" -> swaggerRoutes //swagger is on :8080/doc
+
   )
 
 
