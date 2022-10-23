@@ -1,18 +1,18 @@
-ThisBuild / organization := "com.example"
-ThisBuild / scalaVersion := "3.1.2"
+ThisBuild / organization := "o"
+ThisBuild / scalaVersion := "3.2.0"
 
-val tapirVersion = "1.0.1"
+val tapirVersion = "1.1.3"
 
 lazy val root = (project in file(".")).settings(
   name := "expenses2",
   libraryDependencies ++= Seq(
     // "core" module - IO, IOApp, schedulers
     // This pulls in the kernel and std modules automatically.
-    "org.typelevel" %% "cats-effect" % "3.3.13",
+    "org.typelevel" %% "cats-effect" % "3.3.14",
     // concurrency abstractions and primitives (Concurrent, Sync, Async etc.)
-    "org.typelevel" %% "cats-effect-kernel" % "3.3.13",
+    "org.typelevel" %% "cats-effect-kernel" % "3.3.14",
     // standard "effect" library (Queues, Console, Random etc.)
-    "org.typelevel" %% "cats-effect-std" % "3.3.13",
+    "org.typelevel" %% "cats-effect-std" % "3.3.14",
 
     //Expression calucaltor
     "com.udojava" % "EvalEx" % "2.7",
@@ -29,9 +29,9 @@ lazy val root = (project in file(".")).settings(
     //    "com.softwaremill.sttp.tapir" %% "tapir-openapi-docs" % tapirVersion,
     //    "com.softwaremill.sttp.tapir" %% "tapir-openapi-circe-yaml" % "1.0.0-M9",
     //    "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-bundle" % tapirVersion,
-    "com.softwaremill.sttp.client3" %% "core" % "3.6.2",
+    "com.softwaremill.sttp.client3" %% "core" % "3.8.3",
     //    "org.http4s" %% "http4s-dsl" % "1.0.0-M33" //,"0.23.12"
-    "org.http4s" %% "http4s-dsl" % "0.23.12",
-    "org.http4s" %% "http4s-ember-server" % "0.23.12",
+    "org.http4s" %% "http4s-dsl" % "0.23.16",
+    "org.http4s" %% "http4s-ember-server" % "0.23.16",
   )
 )
