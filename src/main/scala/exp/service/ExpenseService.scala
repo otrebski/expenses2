@@ -1,8 +1,8 @@
 package exp.service
 
 import cats.Applicative
-import exp.model.Model.{Date, Expense, ExpenseSummary, ExpenseToAdd, Purpose, _}
-import exp.model.Model.Purpose.apply
+import exp.model.Model.{Date, Expense, ExpenseSummary, ExpenseToAdd, Purpose, *}
+import exp.model.Model.Purpose.{apply, encoder}
 import cats.implicits.*
 
 trait ExpenseService[F[_]] {
@@ -20,6 +20,8 @@ trait ExpenseService[F[_]] {
   def purposes(): F[List[Purpose]]
 
   def summary(since: Date, until: Date): F[List[ExpenseSummary]]
+
+  def search(since: Date, until: Date, purpose: Option[Purpose]= None, note: Option[Note] = None): F[List[ExpenseSummary]]
 }
 
 object ExpenseService {
@@ -63,6 +65,19 @@ object ExpenseService {
           .values
           .filter(_.date >= since)
           .filter(_.date <= until)
+          .groupBy(_.purpose)
+          .view.mapValues(_.map(_.amount).sum)
+          .map { case (purpose, amount) => ExpenseSummary(purpose = purpose, amount = amount) }
+          .toList
+          .pure[F]
+
+      override def search(since: Date, until: Date, purpose: Option[Purpose], note: Option[Note]): F[List[ExpenseSummary]] =
+        data
+          .values
+          .filter(_.date >= since)
+          .filter(_.date <= until)
+          .filter(expense => purpose.forall(p => p == expense.purpose))
+          .filter(expense => note.forall(n => n == expense.note))
           .groupBy(_.purpose)
           .view.mapValues(_.map(_.amount).sum)
           .map { case (purpose, amount) => ExpenseSummary(purpose = purpose, amount = amount) }

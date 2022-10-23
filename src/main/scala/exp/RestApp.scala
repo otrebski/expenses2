@@ -8,7 +8,7 @@ import exp.model.Model
 import exp.model.Model.{CalculateRequest, CalculateResult, Expense}
 import exp.service.{CalculateService, ExpenseService, NotesService}
 import exp.web.CalculatePartialEndpoints.CalculationError
-import exp.web.{Authentication, CalculateFullEndpoints, CalculatePartialEndpoints, ExpenseLogic, ExpensePartialEndpoints, SummaryLogic, SummaryPartialEndpoints}
+import exp.web.{Authentication, CalculateFullEndpoints, CalculatePartialEndpoints, ExpenseLogic, ExpensePartialEndpoints, SearchPartialEndpoints, SummaryLogic, SummaryPartialEndpoints}
 import exp.web.ExpensePartialEndpoints.Other
 import exp.web.ExpensePartialEndpoints.RequestError
 import org.http4s.server.Router
@@ -20,7 +20,7 @@ import sttp.tapir.server.http4s.Http4sServerInterpreter
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
 
 import scala.concurrent.ExecutionContext
-import sttp.tapir.generic.auto._
+import sttp.tapir.generic.auto.*
 
 object RestApp extends IOApp {
   // the endpoint: single fixed path input ("hello"), single query parameter
@@ -78,6 +78,34 @@ object RestApp extends IOApp {
     }
   }
 
+  private val search = SearchPartialEndpoints.search.serverLogic {
+    _ => {
+      case (since, until) => expenseService.search(since, until).map(Right(_))
+    }
+  }
+
+  private val searchPurpose = SearchPartialEndpoints.searchPurpose.serverLogic {
+    _ => {
+      case (since, until, purpose) => expenseService.search(since, until, purpose = Some(purpose)).map(Right(_))
+    }
+  }
+  private val searchPurposeNote = SearchPartialEndpoints.searchPurposeNotes.serverLogic {
+    _ => {
+      case (since, until, purpose, note) => expenseService.search(since, until, Some(purpose), Some(note)).map(Right(_))
+    }
+  }
+
+  private val searchNote = SearchPartialEndpoints.searchNote.serverLogic {
+    _ => {
+      case (since, until, note) => expenseService.search(since, until, note = Some(note)).map(Right(_))
+    }
+  }
+  private val searchNotePurpose = SearchPartialEndpoints.searchPurposeNotes.serverLogic {
+    _ => {
+      case (since, until, purpose, note) => expenseService.search(since, until, Some(purpose), Some(note)).map(Right(_))
+    }
+  }
+
 
   import org.http4s.dsl.io._
 
@@ -85,8 +113,12 @@ object RestApp extends IOApp {
     case GET -> Root => MovedPermanently("ups!", "Location" -> "index.html")
   }
 
-  val swagger: List[ServerEndpoint[Any, IO]] = SwaggerInterpreter().fromEndpoints[IO](ExpensePartialEndpoints.endpoints :::
-    SummaryPartialEndpoints.endpoints, "swagger", "v1")
+  val swagger: List[ServerEndpoint[Any, IO]] = SwaggerInterpreter().fromEndpoints[IO](
+    ExpensePartialEndpoints.endpoints :::
+      SummaryPartialEndpoints.endpoints :::
+      SearchPartialEndpoints.endpoints :::
+      List(CalculateFullEndpoints.calculate.endpoint), "swagger", "v1")
+
   val swaggerRoutes: HttpRoutes[IO] = Http4sServerInterpreter[IO]().toRoutes(swagger)
 
   val router: HttpRoutes[IO] = Router(
@@ -105,6 +137,11 @@ object RestApp extends IOApp {
         summaryPurposeNote ::
         summaryNote ::
         summaryNotePurpose ::
+        search ::
+        searchPurpose ::
+        searchPurposeNote ::
+        searchNote ::
+        searchNotePurpose ::
         static ::
         Nil
     ),

@@ -13,16 +13,7 @@ import sttp.tapir.generic.auto.*
 import sttp.tapir.json.circe.*
 
 object SummaryPartialEndpoints {
-  //  Summary:
-  //    - "api" / "summary" / "from" / Segment / "to" / Segment
-  //    - "purpose" / Segment / "note" / Segment
-  //    - "note" / Segment / "purpose" / Segment
-  //    - "purpose" / Segment
-  //    - "note" / Segment
-  //https://host.pl/api/expenses/search/from/2022-1/to/2022-7/note/Pentliczek/purpose/maczeta
-  //https://host.pl/api/expenses/search/from/2022-7/to/2022-7
-  //https://host.pl/api/summary/from/2022-01/to/2022-12
-
+  
   trait RequestError
 
   case class RequestAuthenticationError(wrapped: AuthenticationError) extends RequestError
@@ -41,7 +32,7 @@ object SummaryPartialEndpoints {
     .in(path[Date]("Starting date").example(Date(2022, 2)))
     .in("to")
     .in(path[Date]("Ending date").example(Date(2022, 3)))
-    .out(jsonBody[List[ExpenseSummary]])
+    .out(jsonBody[List[ExpenseSummary]]) //TODO ExpenseReport
 
   val summaryPurpose = summary
     .in("purpose").in(path[Purpose]("purpose"))
