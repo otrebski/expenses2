@@ -3,10 +3,15 @@ package exp.web
 import cats.effect.IO
 import exp.model.Model
 import exp.model.Model.{Date, ExpenseReport, NotesSuggestionRequest, NotesSuggestionResponse, Purpose}
+import exp.model.Model.Purpose.encoder
+import exp.model.Model.Purpose.decoder
+import exp.model.Model.Note.decoder
+import exp.model.Model.Note.decoder
+import exp.model.Model.Expense.codec
+import exp.model.Model.ExpenseToAdd.codec
 import exp.web.Authentication.AuthenticationError
-import io.circe.generic.auto._
 import sttp.tapir._
-import sttp.tapir.generic.auto._
+//import sttp.tapir.generic.auto._
 import sttp.tapir.json.circe._
 import sttp.tapir.model.UsernamePassword
 import sttp.tapir.server.PartialServerEndpoint
@@ -82,4 +87,6 @@ object ExpensePartialEndpoints {
 
 
   val endpoints: List[AnyEndpoint] = List(listInterval, notes, allPurposes, purposes, get, add, addList, edit, delete).map(_.endpoint)
+
+
 }

@@ -20,6 +20,7 @@ import sttp.tapir.server.http4s.Http4sServerInterpreter
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
 
 import scala.concurrent.ExecutionContext
+import sttp.tapir.generic.auto._
 
 object RestApp extends IOApp {
   // the endpoint: single fixed path input ("hello"), single query parameter
@@ -50,7 +51,7 @@ object RestApp extends IOApp {
   private val purposes = ExpensePartialEndpoints.purposes.serverLogic(ExpenseLogic.purposes(expenseService))
 
   private val summary = SummaryPartialEndpoints.summary.serverLogic {
-    user => {
+    _ => {
       case (since, until) => expenseService.summary(since, until).map(Right(_))
     }
   }

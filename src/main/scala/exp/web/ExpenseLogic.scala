@@ -37,7 +37,7 @@ object ExpenseLogic {
         val summary = list
           .groupBy(_.purpose)
           .map {
-            case (purpose, expenses) => ExpenseSummary(purpose.value, expenses.map(_.amount).sum)
+            case (purpose, expenses) => ExpenseSummary(purpose, expenses.map(_.amount).sum)
           }.toList
 
         ExpenseReport(expenseSummary = summary, expenses = list).asRight[RequestError].pure[F]

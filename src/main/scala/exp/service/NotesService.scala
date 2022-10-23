@@ -10,7 +10,8 @@ trait NotesService[F[_]] {
 
 object NotesService {
   def mockInstance[F[_] : Applicative]() = new NotesService[F]() {
-    override def notesSuggestions(purpose: Purpose, note: Note): F[List[Suggestion]] =
-      List(Suggestion(note.value, 5), Suggestion(s"${note.value}a", 3)).pure[F]
+    override def notesSuggestions(purpose: Purpose, note: Note): F[List[Suggestion]] = {
+      List(Suggestion(note, 5)).pure[F]
+    }
   }
 }

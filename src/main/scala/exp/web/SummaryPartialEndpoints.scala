@@ -4,7 +4,7 @@ import exp.web.Authentication.AuthenticationError
 import sttp.tapir.{oneOfVariant, stringBody}
 import TapirCodecs.*
 import cats.effect.IO
-import exp.model.Model.{CalculateRequest, CalculateResult, Date, ExpenseSummary}
+import exp.model.Model.{CalculateRequest, CalculateResult, Date, ExpenseSummary, Note, Purpose}
 import exp.web.CalculatePartialEndpoints.CalculationError
 import sttp.tapir.model.UsernamePassword
 import sttp.tapir.server.PartialServerEndpoint
@@ -36,17 +36,18 @@ object SummaryPartialEndpoints {
   private val apiEndpoint = secureEndpoint.in("api")
 
 
-  val summary: PartialServerEndpoint[UsernamePassword,
-    Authentication.User,
-    (Date, Date),
-    RequestError,
-    List[ExpenseSummary], Any, IO
-  ] = apiEndpoint
+  val summary: PartialServerEndpoint[UsernamePassword, Authentication.User, (Date, Date), RequestError, List[ExpenseSummary], Any, IO] = apiEndpoint
     .in("summary" / "from")
     .in(path[Date]("Starting date").example(Date(2022, 2)))
     .in("to")
     .in(path[Date]("Ending date").example(Date(2022, 3)))
     .out(jsonBody[List[ExpenseSummary]])
+
+  val summaryPurpose = summary
+    .in("purpose").in(path[Purpose]("purpose"))
+
+  val summaryNone = summary
+    .in("note").in(path[Note]("note"))
 
   val endpoints: List[AnyEndpoint] = List(summary).map(_.endpoint)
 

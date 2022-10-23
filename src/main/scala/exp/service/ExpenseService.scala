@@ -1,7 +1,8 @@
 package exp.service
 
 import cats.Applicative
-import exp.model.Model.{Date, Expense, ExpenseSummary, ExpenseToAdd, Purpose}
+import exp.model.Model.{Date, Expense, ExpenseSummary, ExpenseToAdd, Purpose, _}
+import exp.model.Model.Purpose.apply
 import cats.implicits.*
 
 trait ExpenseService[F[_]] {
@@ -47,17 +48,14 @@ object ExpenseService {
       }
 
       override def purposes(purpose: Purpose): F[List[Purpose]] = {
-        List("abcd", "asdf", "asdcv")
-          .filter { s =>
-            println(s"Filtering $s (${s.toLowerCase.contains(purpose.value.toLowerCase)})")
-            s.toLowerCase.contains(purpose.value.toLowerCase)
-          }
-          .map(Purpose(_))
+        val l: List[Purpose] = List(Purpose("abcd"), Purpose("asdf"), Purpose("asdcv"))
+        l.filter { p => p.contains(purpose) }
+          //          .map(Purpose(_))
           .pure[F]
       }
 
-      override def purposes(): F[List[Purpose]] = List("abcd", "asdf", "asdcv")
-        .map(Purpose(_))
+      override def purposes(): F[List[Purpose]] = List(Purpose("abcd"), Purpose("asdf"), Purpose("asdcv"))
+        //        .map(Purpose(_))
         .pure[F]
 
       override def summary(since: Date, until: Date): F[List[ExpenseSummary]] =
@@ -67,7 +65,7 @@ object ExpenseService {
           .filter(_.date <= until)
           .groupBy(_.purpose)
           .view.mapValues(_.map(_.amount).sum)
-          .map { case (purpose, amount) => ExpenseSummary(purpose = purpose.value, amount = amount) }
+          .map { case (purpose, amount) => ExpenseSummary(purpose = purpose, amount = amount) }
           .toList
           .pure[F]
     }
