@@ -15,13 +15,12 @@ API:
 ✔ Purposes:
  - ("api" / "purposes" / Segments(0, 1)
 
-Summary:
+✔ Summary:
 - "api" / "summary" / "from" / Segment / "to" / Segment
   - "purpose" / Segment / "note" / Segment
   - "note" / Segment / "purpose" / Segment
   - "purpose" / Segment
   - "note" / Segment
-
 
 Search:
 - ("api" / "expenses" / "search" / "from" / Segment / "to" / Segment

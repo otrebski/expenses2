@@ -56,6 +56,29 @@ object RestApp extends IOApp {
     }
   }
 
+  private val summaryPurpose = SummaryPartialEndpoints.summaryPurpose.serverLogic {
+    _ => {
+      case (since, until, c) => expenseService.summary(since, until).map(Right(_))
+    }
+  }
+  private val summaryPurposeNote = SummaryPartialEndpoints.summaryPurposeNotes.serverLogic {
+    _ => {
+      case (since, until, _, _) => expenseService.summary(since, until).map(Right(_))
+    }
+  }
+
+  private val summaryNote = SummaryPartialEndpoints.summaryNote.serverLogic {
+    _ => {
+      case (since, until, c) => expenseService.summary(since, until).map(Right(_))
+    }
+  }
+  private val summaryNotePurpose = SummaryPartialEndpoints.summaryPurposeNotes.serverLogic {
+    _ => {
+      case (since, until, _, _) => expenseService.summary(since, until).map(Right(_))
+    }
+  }
+
+
   import org.http4s.dsl.io._
 
   val redirect: HttpRoutes[IO] = HttpRoutes.of[IO] {
@@ -63,7 +86,7 @@ object RestApp extends IOApp {
   }
 
   val swagger: List[ServerEndpoint[Any, IO]] = SwaggerInterpreter().fromEndpoints[IO](ExpensePartialEndpoints.endpoints :::
-    SummaryPartialEndpoints.endpoints, "title", "v1")
+    SummaryPartialEndpoints.endpoints, "swagger", "v1")
   val swaggerRoutes: HttpRoutes[IO] = Http4sServerInterpreter[IO]().toRoutes(swagger)
 
   val router: HttpRoutes[IO] = Router(
@@ -78,6 +101,10 @@ object RestApp extends IOApp {
         allPurposes ::
         CalculateFullEndpoints.calculate ::
         summary ::
+        summaryPurpose ::
+        summaryPurposeNote ::
+        summaryNote ::
+        summaryNotePurpose ::
         static ::
         Nil
     ),

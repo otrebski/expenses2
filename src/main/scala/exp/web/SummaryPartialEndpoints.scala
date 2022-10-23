@@ -46,9 +46,17 @@ object SummaryPartialEndpoints {
   val summaryPurpose = summary
     .in("purpose").in(path[Purpose]("purpose"))
 
-  val summaryNone = summary
+  val summaryNote = summary
     .in("note").in(path[Note]("note"))
 
-  val endpoints: List[AnyEndpoint] = List(summary).map(_.endpoint)
+
+  val summaryPurposeNotes = summary
+    .in("purpose").in(path[Purpose]("purpose")).in("note").in(path[Note]("note"))
+
+  val summaryNotePurpose = summary
+    .in("note").in(path[Note]("note")).in("purpose").in(path[Purpose]("purpose"))
+
+
+  val endpoints: List[AnyEndpoint] = List(summary, summaryNote, summaryNotePurpose, summaryPurpose, summaryPurposeNotes).map(_.endpoint)
 
 }
