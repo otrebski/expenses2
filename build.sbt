@@ -1,14 +1,14 @@
 ThisBuild / organization := "o"
 ThisBuild / scalaVersion := "3.2.0"
 
-val tapirVersion = "1.1.3"
+val tapirVersion = "1.2.2"
 
 lazy val root = (project in file(".")).settings(
   name := "expenses2",
   libraryDependencies ++= Seq(
     // "core" module - IO, IOApp, schedulers
     // This pulls in the kernel and std modules automatically.
-    "org.typelevel" %% "cats-effect" % "3.3.14",
+    "org.typelevel" %% "cats-effect" % "3.4.1",
     // concurrency abstractions and primitives (Concurrent, Sync, Async etc.)
     "org.typelevel" %% "cats-effect-kernel" % "3.3.14",
     // standard "effect" library (Queues, Console, Random etc.)
