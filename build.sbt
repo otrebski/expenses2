@@ -1,7 +1,7 @@
 ThisBuild / organization := "o"
-ThisBuild / scalaVersion := "3.2.0"
+ThisBuild / scalaVersion := "3.2.1"
 
-val tapirVersion = "1.2.2"
+val tapirVersion = "1.2.3"
 
 lazy val root = (project in file(".")).settings(
   name := "expenses2",
@@ -10,9 +10,9 @@ lazy val root = (project in file(".")).settings(
     // This pulls in the kernel and std modules automatically.
     "org.typelevel" %% "cats-effect" % "3.4.1",
     // concurrency abstractions and primitives (Concurrent, Sync, Async etc.)
-    "org.typelevel" %% "cats-effect-kernel" % "3.3.14",
+    "org.typelevel" %% "cats-effect-kernel" % "3.4.1",
     // standard "effect" library (Queues, Console, Random etc.)
-    "org.typelevel" %% "cats-effect-std" % "3.3.14",
+    "org.typelevel" %% "cats-effect-std" % "3.4.1",
 
     //Expression calucaltor
     "com.udojava" % "EvalEx" % "2.7",
